@@ -1,27 +1,13 @@
 ﻿#include "opencv2/opencv.hpp"
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-//#include <iostream>
-//#include <algorithm>
-//#include <filesystem> 
-//#include <strstream>
-//#include <string.h>
-//#include <stdio.h>
 #include <windows.h>
-//#include <stdlib.h>
-//#include <vector>
-//#include <stdexcept>
-
 
 using namespace cv;
 using namespace std;
 
 #define THRESHOLD 50
 #define THRESHOLD_MAX_VALUE 255
-
-#define LINE_THICKNESS 10
-#define LINE_TYPE 8
-#define SHIFT 0
 
 int main(int argc, char **argv)
 {
