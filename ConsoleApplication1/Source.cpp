@@ -40,17 +40,29 @@ int main(int argc, char **argv)
 	cvThreshold(templateGrayImage_2, templateBinaryImage_2, THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY);
 	/*** テンプレートマッチング用マーカイメージ　ここまで ***/
 
+	CvPoint minLocation_1;
+	CvPoint minLocation_2;
+
+	std::string fullpath;
+	std::string num_str;
+
+	std::string NEW_IMG_PATH;
+	std::string OUTPUT_PATH;
+
+	const char* cstr;
+
+	int y_1, x_1, y_2, x_2; 
+	int ul_y, ul_x;
+
 	do {
 		if (win32fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 		}
 		else {
-			std::string fullpath = win32fd.cFileName;
+			fullpath = win32fd.cFileName;
 
 			strList.push_back(fullpath);
 
 			std::cout << strList.at(num) << endl;
-
-			std::string num_str;
 
 			if (num < 10) {
 				num_str = "0" + std::to_string(num);
@@ -59,14 +71,12 @@ int main(int argc, char **argv)
 				num_str = std::to_string(num);
 			}
 
-			std::string NEW_IMG_PATH = "./Image/" + fullpath; //変換したいファイルのディレクトリパス
-			std::string OUTPUT_PATH = "./Texture/" + num_str + ".jpg"; //出力先
+			NEW_IMG_PATH = "./Image/" + fullpath; //変換したいファイルのディレクトリパス
+			OUTPUT_PATH = "./Texture/" + num_str + ".jpg"; //出力先
 
 			/*** テンプレートマッチング　ここから ***/
-			CvPoint minLocation_1;
-			CvPoint minLocation_2;
 
-			const char* cstr = NEW_IMG_PATH.c_str();
+			cstr = NEW_IMG_PATH.c_str();
 
 			IplImage *sourceImage = cvLoadImage(cstr, CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
 
@@ -87,20 +97,20 @@ int main(int argc, char **argv)
 			cvMinMaxLoc(differenceMapImage_1, NULL, NULL, &minLocation_1, NULL, NULL );
 			cvMinMaxLoc(differenceMapImage_2, NULL, NULL, &minLocation_2, NULL, NULL);
 
-			int y_1 = minLocation_1.y; //右上y座標
-			int x_1 = minLocation_1.x; //右上x座標
-			int y_2 = minLocation_2.y + templateImage_2->height; //左下y座標
-			int x_2 = minLocation_2.x + templateImage_2->width; //左下x座標
+			y_1 = minLocation_1.y; //右上y座標
+			x_1 = minLocation_1.x; //右上x座標
+			y_2 = minLocation_2.y + templateImage_2->height; //左下y座標
+			x_2 = minLocation_2.x + templateImage_2->width; //左下x座標
 
-			int ul_y = y_2 - y_1; //切り取り範囲y軸
-			int ul_x = x_2 - x_1; //切り取り範囲x軸
+			ul_y = y_2 - y_1; //切り取り範囲y軸
+			ul_x = x_2 - x_1; //切り取り範囲x軸
 
 			printf("右上y：%d, 右上x：%d, 左下y：%d, 左下x：%d\n", y_1, x_1, y_2, x_2);
 
 			/*** テンプレートマッチング　ここまで ***/
 
 			/*** 新規画像読み込み ***/
-			Mat image_raw = imread(NEW_IMG_PATH);
+			cv::Mat image_raw(imread(NEW_IMG_PATH));
 			
 			/*** 切り抜きここから ***/
 			cv::Mat image(image_raw, cv::Rect(x_1, y_1, ul_y, ul_x));
