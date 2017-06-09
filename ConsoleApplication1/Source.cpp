@@ -55,26 +55,26 @@ int main(int argc, char **argv)
 			IplImage *templateImage_2 = cvLoadImage("./Marker/marker_2.jpg", CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
 
 			IplImage *sourceGrayImage = cvCreateImage(cvGetSize(sourceImage), IPL_DEPTH_8U, 1);
-			IplImage *templateGrayImage = cvCreateImage(cvGetSize(templateImage_1), IPL_DEPTH_8U, 1);
+			IplImage *templateGrayImage_1 = cvCreateImage(cvGetSize(templateImage_1), IPL_DEPTH_8U, 1);
 			IplImage *templateGrayImage_2 = cvCreateImage(cvGetSize(templateImage_2), IPL_DEPTH_8U, 1);
 			IplImage *sourceBinaryImage = cvCreateImage(cvGetSize(sourceImage), IPL_DEPTH_8U, 1);
-			IplImage *templateBinaryImage = cvCreateImage(cvGetSize(templateImage_1), IPL_DEPTH_8U, 1);
+			IplImage *templateBinaryImage_1 = cvCreateImage(cvGetSize(templateImage_1), IPL_DEPTH_8U, 1);
 			IplImage *templateBinaryImage_2 = cvCreateImage(cvGetSize(templateImage_2), IPL_DEPTH_8U, 1);
-			IplImage *differenceMapImage = cvCreateImage(cvSize(sourceImage->width - templateImage_1->width +1, sourceImage->height - templateImage_1->height +1), IPL_DEPTH_32F, 1);
+			IplImage *differenceMapImage_1 = cvCreateImage(cvSize(sourceImage->width - templateImage_1->width +1, sourceImage->height - templateImage_1->height +1), IPL_DEPTH_32F, 1);
 			IplImage *differenceMapImage_2 = cvCreateImage(cvSize(sourceImage->width - templateImage_2->width + 1, sourceImage->height - templateImage_2->height + 1), IPL_DEPTH_32F, 1);
 
 			cvCvtColor(sourceImage, sourceGrayImage, CV_BGR2GRAY);
-			cvCvtColor(templateImage_1, templateGrayImage, CV_BGR2GRAY);
+			cvCvtColor(templateImage_1, templateGrayImage_1, CV_BGR2GRAY);
 			cvCvtColor(templateImage_2, templateGrayImage_2, CV_BGR2GRAY);
 
-			cvThreshold(sourceGrayImage, sourceBinaryImage, THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY);
-			cvThreshold(templateGrayImage, templateBinaryImage, THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY);
+			cvThreshold(sourceGrayImage, sourceBinaryImage, THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_OTSU);
+			cvThreshold(templateGrayImage_1, templateBinaryImage_1, THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY);
 			cvThreshold(templateGrayImage_2, templateBinaryImage_2, THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY);
 
-			cvMatchTemplate(sourceBinaryImage, templateBinaryImage, differenceMapImage, CV_TM_SQDIFF);
+			cvMatchTemplate(sourceBinaryImage, templateBinaryImage_1, differenceMapImage_1, CV_TM_SQDIFF);
 			cvMatchTemplate(sourceBinaryImage, templateBinaryImage_2, differenceMapImage_2, CV_TM_SQDIFF);
 
-			cvMinMaxLoc(differenceMapImage, NULL, NULL, &minLocation_1, NULL, NULL );
+			cvMinMaxLoc(differenceMapImage_1, NULL, NULL, &minLocation_1, NULL, NULL );
 			cvMinMaxLoc(differenceMapImage_2, NULL, NULL, &minLocation_2, NULL, NULL);
 
 			int y_1 = minLocation_1.y; //右上y座標
