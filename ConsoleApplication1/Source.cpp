@@ -22,6 +22,24 @@ int main(int argc, char **argv)
 	int num = 0;
 	std::vector<std::string> strList;
 
+
+	/*** テンプレートマッチング用マーカイメージ　ここから ***/
+	IplImage *templateImage_1 = cvLoadImage("./Marker/marker_1.jpg", CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
+	IplImage *templateImage_2 = cvLoadImage("./Marker/marker_2.jpg", CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
+
+	IplImage *templateGrayImage_1 = cvCreateImage(cvGetSize(templateImage_1), IPL_DEPTH_8U, 1);
+	IplImage *templateGrayImage_2 = cvCreateImage(cvGetSize(templateImage_2), IPL_DEPTH_8U, 1);
+
+	IplImage *templateBinaryImage_1 = cvCreateImage(cvGetSize(templateImage_1), IPL_DEPTH_8U, 1);
+	IplImage *templateBinaryImage_2 = cvCreateImage(cvGetSize(templateImage_2), IPL_DEPTH_8U, 1);
+
+	cvCvtColor(templateImage_1, templateGrayImage_1, CV_BGR2GRAY);
+	cvCvtColor(templateImage_2, templateGrayImage_2, CV_BGR2GRAY);
+
+	cvThreshold(templateGrayImage_1, templateBinaryImage_1, THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY);
+	cvThreshold(templateGrayImage_2, templateBinaryImage_2, THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY);
+	/*** テンプレートマッチング用マーカイメージ　ここまで ***/
+
 	do {
 		if (win32fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 		}
@@ -51,25 +69,17 @@ int main(int argc, char **argv)
 			const char* cstr = NEW_IMG_PATH.c_str();
 
 			IplImage *sourceImage = cvLoadImage(cstr, CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
-			IplImage *templateImage_1 = cvLoadImage("./Marker/marker_1.jpg", CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
-			IplImage *templateImage_2 = cvLoadImage("./Marker/marker_2.jpg", CV_LOAD_IMAGE_ANYDEPTH | CV_LOAD_IMAGE_ANYCOLOR);
 
 			IplImage *sourceGrayImage = cvCreateImage(cvGetSize(sourceImage), IPL_DEPTH_8U, 1);
-			IplImage *templateGrayImage_1 = cvCreateImage(cvGetSize(templateImage_1), IPL_DEPTH_8U, 1);
-			IplImage *templateGrayImage_2 = cvCreateImage(cvGetSize(templateImage_2), IPL_DEPTH_8U, 1);
+
 			IplImage *sourceBinaryImage = cvCreateImage(cvGetSize(sourceImage), IPL_DEPTH_8U, 1);
-			IplImage *templateBinaryImage_1 = cvCreateImage(cvGetSize(templateImage_1), IPL_DEPTH_8U, 1);
-			IplImage *templateBinaryImage_2 = cvCreateImage(cvGetSize(templateImage_2), IPL_DEPTH_8U, 1);
+
 			IplImage *differenceMapImage_1 = cvCreateImage(cvSize(sourceImage->width - templateImage_1->width +1, sourceImage->height - templateImage_1->height +1), IPL_DEPTH_32F, 1);
 			IplImage *differenceMapImage_2 = cvCreateImage(cvSize(sourceImage->width - templateImage_2->width + 1, sourceImage->height - templateImage_2->height + 1), IPL_DEPTH_32F, 1);
 
 			cvCvtColor(sourceImage, sourceGrayImage, CV_BGR2GRAY);
-			cvCvtColor(templateImage_1, templateGrayImage_1, CV_BGR2GRAY);
-			cvCvtColor(templateImage_2, templateGrayImage_2, CV_BGR2GRAY);
 
 			cvThreshold(sourceGrayImage, sourceBinaryImage, THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_OTSU);
-			cvThreshold(templateGrayImage_1, templateBinaryImage_1, THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY);
-			cvThreshold(templateGrayImage_2, templateBinaryImage_2, THRESHOLD, THRESHOLD_MAX_VALUE, CV_THRESH_BINARY);
 
 			cvMatchTemplate(sourceBinaryImage, templateBinaryImage_1, differenceMapImage_1, CV_TM_SQDIFF);
 			cvMatchTemplate(sourceBinaryImage, templateBinaryImage_2, differenceMapImage_2, CV_TM_SQDIFF);
@@ -106,8 +116,21 @@ int main(int argc, char **argv)
 			num = num + 1;
 			printf("%d枚目\n", num);
 
+			cvReleaseImage(&sourceImage);
+			cvReleaseImage(&sourceGrayImage);
+			cvReleaseImage(&sourceBinaryImage);
+			cvReleaseImage(&differenceMapImage_1);
+			cvReleaseImage(&differenceMapImage_2);
+
 		}
 	} while (FindNextFile(hFind, &win32fd)); 
+
+	cvReleaseImage(&templateImage_1);
+	cvReleaseImage(&templateImage_2);
+	cvReleaseImage(&templateGrayImage_1);
+	cvReleaseImage(&templateGrayImage_2);
+	cvReleaseImage(&templateBinaryImage_1);
+	cvReleaseImage(&templateBinaryImage_2);
 
 	FindClose(hFind);
 
