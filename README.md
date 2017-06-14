@@ -2,6 +2,8 @@
 
 開発：Shimizu Satoru
 
+branchのCrop-texture-generator-jpgはjpg画像生成，Crop-texture-generator-pngはpng画像生成をそれぞれ行う
+
 ====
 
 ## Overview
