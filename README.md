@@ -1,5 +1,4 @@
-# Crop-texture-generator
--jpg
+# Crop-texture-generator-jpg
 
 äJî≠ÅFShimizu Satoru
 
